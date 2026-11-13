@@ -49,10 +49,13 @@ function check_errors(array $errors): void { if ($errors) fail(implode(' ', $err
 function act_change_password(array $u): void {
     $row = row('SELECT password FROM users WHERE user_id = ?', [$u['user_id']]);
     $new = (string)($_POST['new_password'] ?? '');
-    if ((string)($_POST['current_password'] ?? '') !== $row['password']) fail('Current password is incorrect.');
+    $stored = (string)$row['password'];
+    $current = (string)($_POST['current_password'] ?? '');
+    $currentOk = is_hashed_password($stored) ? password_verify($current, $stored) : hash_equals($stored, $current);
+    if (!$currentOk) fail('Current password is incorrect.');
     if ($new !== (string)($_POST['confirm_password'] ?? '')) fail('New passwords do not match.');
     if (!strong_password($new)) fail('New password must be at least 8 characters with letters and numbers.');
-    q('UPDATE users SET password = ? WHERE user_id = ?', [$new, $u['user_id']]);
+    q('UPDATE users SET password = ? WHERE user_id = ?', [password_hash($new, PASSWORD_DEFAULT), $u['user_id']]);
     audit('change_password', 'user', (int)$u['user_id']);
     flash('success', 'Password updated.');
 }
@@ -78,7 +81,7 @@ function act_add_student(array $u): void {
     $d = student_input(null, null);
     $pw = 'Student@123';
     db()->beginTransaction();
-    q("INSERT INTO users (role, email, password, full_name) VALUES ('student',?,?,?)", [$d['email'], $pw, $d['name']]);
+    q("INSERT INTO users (role, email, password, full_name) VALUES ('student',?,?,?)", [$d['email'], password_hash($pw, PASSWORD_DEFAULT), $d['name']]);
     $uid = (int)db()->lastInsertId();
     q('INSERT INTO students (user_id, reg_no, contact_no, district, degree) VALUES (?,?,?,?,?)', [$uid, $d['reg'], $d['contact'], $d['district'], $d['degree']]);
     $sid = (int)db()->lastInsertId();
@@ -116,7 +119,7 @@ function act_reset_password(array $u): void {
     $s = row('SELECT user_id FROM students WHERE student_id = ?', [$sid]);
     if (!$s) fail('Student not found.');
     $pw = 'Student@123';
-    q('UPDATE users SET password = ? WHERE user_id = ?', [$pw, $s['user_id']]);
+    q('UPDATE users SET password = ? WHERE user_id = ?', [password_hash($pw, PASSWORD_DEFAULT), $s['user_id']]);
     audit('reset_password', 'student', $sid);
     flash('success', "Password reset to default: $pw");
 }

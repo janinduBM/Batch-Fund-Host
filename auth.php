@@ -30,15 +30,28 @@ function require_role(string $role): array
 
 function home_for(string $role): string { return $role === 'coordinator' ? 'coordinator.php' : 'student.php'; }
 
+/** True if the stored value is a real password hash (bcrypt/argon), false if old plain text. */
+function is_hashed_password(string $stored): bool
+{
+    return !empty(password_get_info($stored)['algo']);
+}
+
 function attempt_login(string $email, string $password): array
 {
     if (($_SESSION['lock_until'] ?? 0) > time()) {
         return [false, 'Too many failed attempts. Try again in a few minutes.'];
     }
     $u = row('SELECT * FROM users WHERE email = ?', [strtolower($email)]);
-    
-    $ok = $u && ($password === $u['password']) && $u['is_active'];
-    
+
+    $valid = false;
+    if ($u) {
+        $stored = (string)$u['password'];
+        $valid = is_hashed_password($stored)
+            ? password_verify($password, $stored)
+            : hash_equals($stored, $password);   // old plain-text rows, upgraded below
+    }
+    $ok = $valid && $u['is_active'];
+
     if ($ok && $u['role'] === 'student') {
         $ok = (bool)val("SELECT COUNT(*) FROM students WHERE user_id = ? AND status = 'active'", [$u['user_id']]);
     }
@@ -48,9 +61,16 @@ function attempt_login(string $email, string $password): array
         usleep(400000);
         return [false, 'Invalid email or password.'];
     }
+
+    // Upgrade plain-text (or outdated-hash) passwords to a secure hash on successful login.
+    $stored = (string)$u['password'];
+    if (!is_hashed_password($stored) || password_needs_rehash($stored, PASSWORD_DEFAULT)) {
+        q('UPDATE users SET password = ? WHERE user_id = ?', [password_hash($password, PASSWORD_DEFAULT), $u['user_id']]);
+    }
+
     session_regenerate_id(true);
     $_SESSION = ['user_id' => (int)$u['user_id'], 'last_seen' => time(), 'csrf' => bin2hex(random_bytes(32))];
-    
+
     q('UPDATE users SET last_login_at = NOW() WHERE user_id = ?', [$u['user_id']]);
     audit('login', 'user', (int)$u['user_id'], 'Successful login');
     return [true, home_for($u['role'])];

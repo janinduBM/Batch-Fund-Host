@@ -6,6 +6,12 @@ define('DB_PASS', getenv('DB_PASS') ?: '');
 
 define('APP_NAME', 'BatchFund');
 define('BATCH_NAME', 'Batch Fund & Committee Management');
+
+// ---- EDIT THESE TWO: shown on the login page and privacy policy ----
+define('ORG_NAME', 'Your University / Faculty and Batch name');
+define('CONTACT_EMAIL', 'your-email@example.com');
+// --------------------------------------------------------------------
+
 define('CURRENCY', 'Rs.');
 define('EXPENSE_APPROVAL_REQUIRED', true);
 define('MAX_UPLOAD_BYTES', 3 * 1024 * 1024);
@@ -29,6 +35,13 @@ header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: same-origin');
 
+function is_https(): bool
+{
+    // Azure App Service terminates HTTPS at its proxy, so also check the forwarded header.
+    return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
+        || strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+}
+
 function start_secure_session(): void
 {
     if (session_status() === PHP_SESSION_ACTIVE) {
@@ -40,7 +53,7 @@ function start_secure_session(): void
         'path'     => '/',
         'httponly' => true,
         'samesite' => 'Lax',
-        'secure'   => !empty($_SERVER['HTTPS']),
+        'secure'   => is_https(),
     ]);
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
