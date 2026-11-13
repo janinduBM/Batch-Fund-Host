@@ -505,7 +505,7 @@ function page_start(string $title, array $nav, string $active, array $user, int 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?= h($title) ?> – <?= APP_NAME ?></title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="style.css?v=<?= (int) @filemtime(__DIR__ . '/style.css') ?>">
     </head>
 
     <body>
@@ -563,7 +563,7 @@ function page_end(): void
                 </main>
             </div>
         </div>
-        <script src="script.js"></script>
+        <script src="script.js?v=<?= (int) @filemtime(__DIR__ . '/script.js') ?>"></script>
     </body>
 
     </html>
