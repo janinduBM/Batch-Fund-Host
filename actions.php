@@ -294,7 +294,6 @@ function expense_input(): array {
     check_errors($e);
     return $d;
 }
-function expense_categories(): array { return ['Event', 'Food & Refreshments', 'Printing & Stationery', 'Transport', 'Gifts & Welfare', 'Equipment', 'Donations', 'Other']; }
 function save_expense_document(int $expenseId, int $public): void {
     if (!isset($_FILES['document']) || $_FILES['document']['error'] === UPLOAD_ERR_NO_FILE) return;
     [$ok, $f] = handle_upload($_FILES['document']);
