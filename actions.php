@@ -2,7 +2,7 @@
 require_once __DIR__ . '/auth.php';
 
 // TEMPORARY: set to true to show the real error on screen. Set back to false when finished.
-const SHOW_DEBUG_ERRORS = true;
+const SHOW_DEBUG_ERRORS = false;
 
 $user = current_user();
 if (!$user) { flash('error', 'Please log in to continue.'); redirect('index.php'); }
