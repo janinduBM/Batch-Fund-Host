@@ -198,7 +198,7 @@ function page_students(array $u): void
             <tr>
               <td><?= h($s['reg_no']) ?></td>
               <td><?= h($s['full_name']) ?></td>
-              <td><?= h($s['degree']) ?></td>
+              <td><?= h($s['degree'] ?? '') ?></td>
               <td><?= h($s['email']) ?></td>
               <td><?= h($s['contact_no']) ?></td>
               <td><?= h($s['district']) ?></td>
@@ -209,7 +209,7 @@ function page_students(array $u): void
           <?php endforeach;
           if (!$list): ?>
             <tr>
-              <td colspan="7" class="muted center">No students found.</td>
+              <td colspan="8" class="muted center">No students found.</td>
             </tr><?php endif; ?>
         </tbody>
       </table>
@@ -219,11 +219,11 @@ function page_students(array $u): void
   <dialog id="dlgAddStudent">
     <form method="post" action="actions.php" class="form" data-validate>
       <h2>Add student</h2>
-      <?= csrf_field() ?>  <?= ret() ?><input type="hidden" name="action" value="add_student">
+      <?= csrf_field() ?><?= ret() ?><input type="hidden" name="action" value="add_student">
       <label>Full name<input name="full_name" required minlength="3" maxlength="120"></label>
-      <label>Index number<input name="reg_no" required pattern="[A-Z0-9]{7}"minlength="7" maxlength="7"></label>
+      <label>Index number<input name="reg_no" required pattern="[A-Za-z0-9]{7}" minlength="7" maxlength="7"></label>
       <label>Degree Name
-        <select name="degree">
+        <select name="degree" required>
           <option value="IT">IT</option>
           <option value="ITM">ITM</option>
           <option value="AI">AI</option>
@@ -233,16 +233,16 @@ function page_students(array $u): void
       <label>Contact number<input name="contact_no" required pattern="\+?[0-9][0-9\s\-]{6,18}"
           placeholder="0771234567"></label>
       <label>District
-        <select name="district">
+        <select name="district" required>
           <option value="Colombo">Colombo</option>
-          <option value="Gampha">Gampha</option>
+          <option value="Gampaha">Gampaha</option>
           <option value="Kalutara">Kalutara</option>
           <option value="Kandy">Kandy</option>
-          <option value="Kulunegala">Kurunegala</option>
+          <option value="Kurunegala">Kurunegala</option>
           <option value="Matara">Matara</option>
         </select>
       </label>
-      <label>Default password - Student@123</label>
+      <p class="muted small">Default password: Student@123</p>
       <div class="dlg-actions"><button class="btn" type="button" data-close>Cancel</button><button class="btn btn-primary"
           type="submit">Add student</button></div>
     </form>
@@ -266,6 +266,13 @@ function page_student_view(array $u): void
     else
       $out += $c['amount'];
   }
+  $curDegree = (string) ($s['degree'] ?? '');
+  $degrees = ['IT', 'ITM', 'AI'];
+  if ($curDegree !== '' && !in_array($curDegree, $degrees, true))
+    $degrees[] = $curDegree;
+  $districts = ['Colombo', 'Gampaha', 'Kalutara', 'Kandy', 'Kurunegala', 'Matara'];
+  if ($s['district'] !== '' && !in_array($s['district'], $districts, true))
+    $districts[] = $s['district'];
   ?>
   <p><a href="?page=students">← Back to students</a></p>
   <div class="stats">
@@ -277,10 +284,24 @@ function page_student_view(array $u): void
       <form method="post" action="actions.php" class="form" data-validate><?= csrf_field() ?><?= ret() ?><input
           type="hidden" name="action" value="update_student"><input type="hidden" name="student_id" value="<?= $sid ?>">
         <label>Full name<input name="full_name" value="<?= h($s['full_name']) ?>" required minlength="3"></label>
-        <label>Registration number<input name="reg_no" value="<?= h($s['reg_no']) ?>" required></label>
+        <label>Index number<input name="reg_no" value="<?= h($s['reg_no']) ?>" required pattern="[A-Za-z0-9]{7}" minlength="7" maxlength="7"></label>
+        <label>Degree
+          <select name="degree" required>
+            <?php if ($curDegree === ''): ?><option value="" selected disabled>Select…</option><?php endif; ?>
+            <?php foreach ($degrees as $d): ?>
+              <option value="<?= h($d) ?>" <?= $curDegree === $d ? 'selected' : '' ?>><?= h($d) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
         <label>Email<input type="email" name="email" value="<?= h($s['email']) ?>" required></label>
         <label>Contact number<input name="contact_no" value="<?= h($s['contact_no']) ?>" required></label>
-        <label>District<input name="district" value="<?= h($s['district']) ?>" required></label>
+        <label>District
+          <select name="district" required>
+            <?php foreach ($districts as $d): ?>
+              <option value="<?= h($d) ?>" <?= $s['district'] === $d ? 'selected' : '' ?>><?= h($d) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
         <button class="btn btn-primary" type="submit">Save changes</button>
       </form>
     </div>
