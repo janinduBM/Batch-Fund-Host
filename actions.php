@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// TEMPORARY: set to true to show the real error on screen. Set back to false when finished.
+const SHOW_DEBUG_ERRORS = true;
+
 $user = current_user();
 if (!$user) { flash('error', 'Please log in to continue.'); redirect('index.php'); }
 
@@ -39,7 +42,11 @@ try {
 } catch (Throwable $e) {
     error_log('BatchFund action ' . $action . ' failed: ' . $e->getMessage());
     if (db()->inTransaction()) db()->rollBack();
-    flash('error', 'Something went wrong while processing your request. Nothing was changed.');
+    if (SHOW_DEBUG_ERRORS) {
+        flash('error', 'DEBUG [' . $action . ']: ' . $e->getMessage());
+    } else {
+        flash('error', 'Something went wrong while processing your request. Nothing was changed.');
+    }
 }
 redirect(safe_return($defaultReturn));
 
