@@ -8,8 +8,8 @@ define('APP_NAME', 'BatchFund');
 define('BATCH_NAME', 'Batch Fund & Committee Management');
 
 // ---- EDIT THESE TWO: shown on the login page and privacy policy ----
-define('ORG_NAME', 'Your University / Faculty and Batch name');
-define('CONTACT_EMAIL', 'your-email@example.com');
+define('ORG_NAME', 'Faculty of Information Technology, University of Moratuwa – Batch 25');
+define('CONTACT_EMAIL', 'itfaculty@uom.lk');
 // --------------------------------------------------------------------
 
 define('CURRENCY', 'Rs.');

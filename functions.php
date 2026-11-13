@@ -564,6 +564,13 @@ function page_start(string $title, array $nav, string $active, array $user, int 
 function page_end(): void
 { ?>
                 </main>
+                <footer class="site-footer">
+                    <span>&copy; <?= date('Y') ?> <?= h(APP_NAME) ?> &middot; <?= h(ORG_NAME) ?></span>
+                    <span class="footer-links">
+                        <a href="mailto:<?= h(CONTACT_EMAIL) ?>">Contact</a>
+                        <a href="privacy.php">Privacy policy</a>
+                    </span>
+                </footer>
             </div>
         </div>
         <script>
