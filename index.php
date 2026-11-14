@@ -17,6 +17,8 @@ if ($u)
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login – <?= h(APP_NAME) ?> | <?= h(ORG_NAME) ?></title>
   <meta name="description" content="<?= h(APP_NAME) ?> is the batch fund and committee management system for <?= h(ORG_NAME) ?>. Members can view collections, submit payment receipts and read financial statements.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <link rel="stylesheet" href="login.css">
   <style>
     /* Wrapper keeps the about text and footer OUTSIDE the two-column login card */

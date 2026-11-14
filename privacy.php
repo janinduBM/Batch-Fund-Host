@@ -13,6 +13,8 @@ if (!defined('CONTACT_EMAIL')) define('CONTACT_EMAIL', 'your-email@example.com')
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy – <?= h(APP_NAME) ?></title>
   <meta name="description" content="Privacy policy for <?= h(APP_NAME) ?>, the batch fund management system of <?= h(ORG_NAME) ?>.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <style>
     body { margin: 0; background: #eef0f4; color: #1c2433; font-family: "Roboto", "Segoe UI", system-ui, sans-serif; line-height: 1.65; }
     main { max-width: 760px; margin: 32px auto; padding: 28px 32px; background: #fff; border: 1px solid #e1e4ea; border-radius: 8px; }
