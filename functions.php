@@ -508,9 +508,9 @@ function page_start(string $title, array $nav, string $active, array $user, int 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><?= h($title) ?> – <?= APP_NAME ?></title>
-        <link rel="stylesheet" href="style.css?v=<?= (int) @filemtime(__DIR__ . '/style.css') ?>
+        <link rel="stylesheet" href="style.css?v=<?= (int) @filemtime(__DIR__ . '/style.css') ?>">
         <link rel="icon" type="image/png" href="logo.png">
-        <link rel="apple-touch-icon" href="logo.png">">
+        <link rel="apple-touch-icon" href="logo.png">
     </head>
 
     <body>
